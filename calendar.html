@@ -6,22 +6,20 @@
         <style type="text/css">
         * {margin: 0px; padding: 0px; list-style-type: none;}
         #box {width: 500px; border: 2px solid #3399ff; margin: 100px auto 0 auto; border-radius: 5px;}
-        #top {width: 100%; height: 50px; border-bottom: 1px solid #3399ff; margin-top: 20px; text-align: center;}
-        #year, #month {margin-right: 10px;}
+        #top {height: 50px; border-bottom: 1px solid #3399ff;text-align: right; padding: 10px 20px;}
+        #year, #month {width: 100px; height: 40px; font-size: 20px; padding: 0 10px; outline: none; appearance: none; -moz-appearance: none; -webkit-appearance: none; border: 1px solid #3399ff; border-radius: 5px;}
+        #btn-today {height: 40px; outline: none; border: none; background-color: #3399ff; border-radius: 5px; color: white; font-size: 20px; line-height: 40px; padding: 0 5px; margin-left: 10px; cursor: pointer;}
         #con {width: 100%; height: 357px;}
         #con ul li {width: 14.28%; height: 50px; border-bottom: 1px solid #ddd; float: left; line-height: 50px;}
         #con ul.week {width: 100%; height:50px; text-align: center; margin-top: 3px;}
         #con ul.week li.weekend {color: red;}
         #con ul.day {width: 100%; height: 49px; text-align: center;}
+        #con ul.day li.current {color: red;}
         </style>
     </head>
     <body>
         <div id="box">
-            <div id="top">
-                <select id="year"></select>Year
-                <select id="month"></select>Month
-                <button style="width:70px; height:20px;" onclick="query()">SEARCH</button>
-            </div>
+            <div id="top"><p><select id="year" onchange="switchTo()"></select>&nbsp;-&nbsp;<select id="month" onchange="switchTo()"></select><button onclick="switchToToday()" id="btn-today">Today</button></p></div>
             <div id="con">
                 <ul class="week">
                     <li class="weekend">Sun</li>
@@ -32,50 +30,7 @@
                     <li>Fri</li>
                     <li class="weekend">Sat</li>
                 </ul>
-                <ul class="day">
-                    <li></li>
-                    <li></li>
-                    <li></li>
-                    <li></li>
-                    <li></li>
-                    <li></li>
-                    <li></li>
-                    <li></li>
-                    <li></li>
-                    <li></li>
-                    <li></li>
-                    <li></li>
-                    <li></li>
-                    <li></li>
-                    <li></li>
-                    <li></li>
-                    <li></li>
-                    <li></li>
-                    <li></li>
-                    <li></li>
-                    <li></li>
-                    <li></li>
-                    <li></li>
-                    <li></li>
-                    <li></li>
-                    <li></li>
-                    <li></li>
-                    <li></li>
-                    <li></li>
-                    <li></li>
-                    <li></li>
-                    <li></li>
-                    <li></li>
-                    <li></li>
-                    <li></li>
-                    <li></li>
-                    <li></li>
-                    <li></li>
-                    <li></li>
-                    <li></li>
-                    <li></li>
-                    <li></li>
-                </ul>
+                <ul class="day" id="day"></ul>
             </div>
         </div>
         <script type="text/javascript">
@@ -87,57 +42,61 @@
 
             var oYear = document.getElementById("year");
             var oMonth =  document.getElementById("month");
-            var oLi =  document.querySelectorAll(".day li");
-            var nowDate =  new Date();
+            var oDay = document.getElementById("day")
             
+            each({start: 1, end: 42}, function(i) {
+                var oLi = document.createElement("li");
+                oDay.appendChild(oLi);
+            });
+            var oLis =  document.querySelectorAll(".day li");
 
-            each({
-                start: 1990,
-                end: 2050
-            }, function(i) {
+            each({start: 1990, end: 2050}, function(i) {
                 var oOption = document.createElement("option");
                 oOption.innerHTML = i;
                 oOption.value = i;
                 oYear.appendChild(oOption);
             });
 
-            each({
-                start: 1,
-                end: 12
-            }, function(i) {
+            each({start: 1, end: 12}, function(i) {
                 var oOption = document.createElement("option");
                 oOption.innerHTML = i;
                 oOption.value = i - 1;
                 oMonth.appendChild(oOption);
             });
-            query(nowDate.getFullYear(), nowDate.getMonth());
 
-            function query(argYear, argMonth){
+            var nowDate =  new Date();
+            var thisYear = nowDate.getFullYear();
+            var thisMonth = nowDate.getMonth();
+            var thisDay = nowDate.getDate();
+            
+            switchToToday()
+
+            function switchToToday() {
+                switchTo(thisYear, thisMonth);
+            }
+
+            function switchTo(argYear, argMonth){
                 var yearVal = argYear || oYear.value;
                 var monthVal = argMonth || oMonth.value;
-
-                if(!(yearVal && monthVal)){
-                    return alert("Please select year or month");
-                }
-
                 selectValue(oYear, yearVal);
                 selectValue(oMonth, monthVal);
-
                 var dataObj = new Date(yearVal,monthVal);
                 var selDay = dataObj.getDay();
                 var monthCount = getMonthCount(yearVal,monthVal);
 
-                oLi.forEach(function(el){
+                oLis.forEach(function(el){
                     el.innerHTML = "";
                 });
 
-                each({
-                    start: 1,
-                    end: monthCount,
-                }, function(i){
-                    oLi[selDay + i - 1].innerHTML = i;
+                each({start: 1, end: monthCount}, function(i){
+                    var curLi = oLis[selDay + i - 1];
+                    if (yearVal == thisYear && monthVal == thisMonth && i == thisDay) {
+                        curLi.setAttribute("class", "current");
+                    } else {
+                        curLi.removeAttribute("class");
+                    }
+                    curLi.innerHTML = i;
                 });
-
             }
 
             function getMonthCount(year,month){
