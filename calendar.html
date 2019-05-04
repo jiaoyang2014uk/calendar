@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>canlendar</title>
+        <style type="text/css">
+        * {margin: 0px; padding: 0px; list-style-type: none;}
+        #box {width: 500px; border: 2px solid #3399ff; margin: 100px auto 0 auto; border-radius: 5px;}
+        #top {width: 100%; height: 50px; border-bottom: 1px solid #3399ff; margin-top: 20px; text-align: center;}
+        #year, #month {margin-right: 10px;}
+        #con {width: 100%; height: 357px;}
+        #con ul li {width: 14.28%; height: 50px; border-bottom: 1px solid #ddd; float: left; line-height: 50px;}
+        #con ul.week {width: 100%; height:50px; text-align: center; margin-top: 3px;}
+        #con ul.week li.weekend {color: red;}
+        #con ul.day {width: 100%; height: 49px; text-align: center;}
+        </style>
+    </head>
+    <body>
+        <div id="box">
+            <div id="top">
+                <select id="year"></select>Year
+                <select id="month"></select>Month
+                <button style="width:70px; height:20px;" onclick="query()">SEARCH</button>
+            </div>
+            <div id="con">
+                <ul class="week">
+                    <li class="weekend">Sun</li>
+                    <li>Mon</li>
+                    <li>Tues</li>
+                    <li>Wed</li>
+                    <li>Thur</li>
+                    <li>Fri</li>
+                    <li class="weekend">Sat</li>
+                </ul>
+                <ul class="day">
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                </ul>
+            </div>
+        </div>
+        <script type="text/javascript">
+            function each(argCollection, callback) {
+                for(var i = argCollection.start; i <= argCollection.end; i++){
+                    callback(i);
+                }
+            }
+
+            var oYear = document.getElementById("year");
+            var oMonth =  document.getElementById("month");
+            var oLi =  document.querySelectorAll(".day li");
+            var nowDate =  new Date();
+            
+
+            each({
+                start: 1990,
+                end: 2050
+            }, function(i) {
+                var oOption = document.createElement("option");
+                oOption.innerHTML = i;
+                oOption.value = i;
+                oYear.appendChild(oOption);
+            });
+
+            each({
+                start: 1,
+                end: 12
+            }, function(i) {
+                var oOption = document.createElement("option");
+                oOption.innerHTML = i;
+                oOption.value = i - 1;
+                oMonth.appendChild(oOption);
+            });
+            query(nowDate.getFullYear(), nowDate.getMonth());
+
+            function query(argYear, argMonth){
+                var yearVal = argYear || oYear.value;
+                var monthVal = argMonth || oMonth.value;
+
+                if(!(yearVal && monthVal)){
+                    return alert("Please select year or month");
+                }
+
+                selectValue(oYear, yearVal);
+                selectValue(oMonth, monthVal);
+
+                var dataObj = new Date(yearVal,monthVal);
+                var selDay = dataObj.getDay();
+                var monthCount = getMonthCount(yearVal,monthVal);
+
+                oLi.forEach(function(el){
+                    el.innerHTML = "";
+                });
+
+                each({
+                    start: 1,
+                    end: monthCount,
+                }, function(i){
+                    oLi[selDay + i - 1].innerHTML = i;
+                });
+
+            }
+
+            function getMonthCount(year,month){
+                var data = [31,28,31,30,31,30,31,31,30,31,30,31];
+
+                if((year % 4 == 0) && (year % 400 != 0 || year % 100 == 0)){
+                    data[1] = 29;
+                }
+
+                return data[month];
+            }
+
+            function selectValue(el, val) {
+                options = el.querySelectorAll("option")
+                options.forEach(function(el){
+                    if (el.value == val) {
+                        el.setAttribute("selected", "selected");
+                    } else {
+                        el.removeAttribute("selected");
+                    }
+                });
+            }
+
+        </script>
+    </body>
+</html>
